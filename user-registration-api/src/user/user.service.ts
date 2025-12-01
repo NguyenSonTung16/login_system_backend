@@ -1,10 +1,9 @@
-import { Injectable, BadRequestException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './schemas/user.schema';
 import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 
 // User service - Business logic: check email, hash password, create user
 @Injectable()
@@ -41,31 +40,6 @@ export class UserService {
         throw new BadRequestException('Email đã được sử dụng');
       }
       throw new InternalServerErrorException('Đã xảy ra lỗi khi đăng ký người dùng');
-    }
-  }
-
-  async login(dto: LoginDto) {
-    try {
-      const user = await this.userModel.findOne({ email: dto.email });
-      if (!user) {
-        throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
-      }
-
-      const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
-      }
-
-      return {
-        message: 'Đăng nhập thành công',
-        id: user._id,
-        email: user.email,
-      };
-    } catch (error) {
-      if (error instanceof UnauthorizedException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Đã xảy ra lỗi khi đăng nhập');
     }
   }
 }

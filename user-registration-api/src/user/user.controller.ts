@@ -1,14 +1,14 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { UserService } from './user.service';
-import { RegisterDto } from './dto/register.dto';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
-// User controller - Handles POST /user/register
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
-
-  @Post('register')
-  async register(@Body() dto: RegisterDto) {
-    return this.userService.register(dto);
+  @UseGuards(AuthGuard('jwt')) // Yêu cầu phải có Token mới cho vào
+  @Get('profile')
+  getProfile(@Req() req: any) {
+    return {
+      message: 'Chúc mừng! Bạn đã truy cập vào vùng bảo mật.',
+      user: req.user, // Trả về thông tin user lấy từ token
+    };
   }
 }

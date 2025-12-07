@@ -3,14 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './schemas/user.schema';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterDto } from '../auth/dto/register.dto';
 
-// User service - Business logic: check email, hash password, create user
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async register(dto: RegisterDto) {
+    // ... (Giữ nguyên code hàm register cũ của bạn ở đây) ...
     try {
       const exists = await this.userModel.findOne({ email: dto.email });
       if (exists) {
@@ -33,13 +33,19 @@ export class UserService {
         email: savedUser.email,
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      if (error.code === 11000) {
-        throw new BadRequestException('Email đã được sử dụng');
-      }
-      throw new InternalServerErrorException('Đã xảy ra lỗi khi đăng ký người dùng');
+      // ... (Giữ nguyên xử lý lỗi cũ) ...
+        if (error instanceof BadRequestException) {
+            throw error;
+        }
+        if (error.code === 11000) {
+            throw new BadRequestException('Email đã được sử dụng');
+        }
+        throw new InternalServerErrorException('Đã xảy ra lỗi khi đăng ký người dùng');
     }
+  }
+
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    // Tìm user và trả về đầy đủ thông tin (bao gồm cả mật khẩu đã hash để so sánh)
+    return this.userModel.findOne({ email }).exec();
   }
 }

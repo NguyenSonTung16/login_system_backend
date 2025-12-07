@@ -11,13 +11,13 @@ import { JwtStrategy } from './jwt.strategy';
   imports: [
     ConfigModule,
     UserModule,
-    PassportModule, // 👈 3. Thêm PassportModule vào đây
+    PassportModule, 
     JwtModule.register({}),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    JwtStrategy, // 👈 4. QUAN TRỌNG NHẤT: Thêm JwtStrategy vào đây
+    JwtStrategy, 
   ],
   exports: [AuthService],
 })

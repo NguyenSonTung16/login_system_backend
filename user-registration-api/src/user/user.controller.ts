@@ -1,14 +1,23 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common'; 
+import { UserService } from './user.service';
+import { RegisterDto } from '../auth/dto/register.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; 
 
 @Controller('user')
 export class UserController {
-  @UseGuards(AuthGuard('jwt')) // Yêu cầu phải có Token mới cho vào
+  constructor(private userService: UserService) {}
+
+  @Post('register')
+  async register(@Body() dto: RegisterDto) {
+    return this.userService.register(dto);
+  }
+
+  // API Lấy thông tin cá nhân (Cần Access Token)
+  @UseGuards(JwtAuthGuard) // Bắt buộc phải có Token hợp lệ mới gọi được
   @Get('profile')
-  getProfile(@Req() req: any) {
-    return {
-      message: 'Chúc mừng! Bạn đã truy cập vào vùng bảo mật.',
-      user: req.user, // Trả về thông tin user lấy từ token
-    };
+  async getProfile(@Req() req) {
+    // req.user được tạo ra từ file jwt.strategy.ts 
+    // dùng email từ token để tìm user đầy đủ trong DB
+    return this.userService.findByEmail(req.user.email);
   }
 }
